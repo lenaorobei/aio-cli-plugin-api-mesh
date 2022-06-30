@@ -113,12 +113,30 @@ async function getProject(imsOrgId, imsOrgTitle) {
 	const { consoleCLI } = await getLibConsoleCLI();
 
 	const projects = await consoleCLI.getProjects(imsOrgId);
-	if (projects.length !== 0) {
-		const selectedProject = await consoleCLI.promptForSelectProject(projects);
+	if (process.env.READ_FILE) {
+		let data;
 
-		return selectedProject;
+		try {
+			data = await readFile(global.file, 'utf8');
+			const fileProject = data.Project;
+
+			return fileProject;
+		} catch (error) {
+			logger.error(error);
+
+			this.log(error.message);
+			this.error(
+				'Unable to read the mesh configuration file provided. Please check the file and try again.',
+			);
+		}
 	} else {
-		aioConsoleLogger.error(`No projects found for the selected organization: ${imsOrgTitle}`);
+		if (projects.length !== 0) {
+			const selectedProject = await consoleCLI.promptForSelectProject(projects);
+	
+			return selectedProject;
+		} else {
+			aioConsoleLogger.error(`No projects found for the selected organization: ${imsOrgTitle}`);
+		}
 	}
 }
 
@@ -193,6 +211,15 @@ async function initRequestId() {
 }
 
 /**
+ * Stores the argument file globally so it can referenced for the lifecycle of 
+ * this command request
+ * @param {file} file
+ */
+async function initFile(file) {
+	global.file = file;
+}
+
+/**
  * Function to run the CLI Y/N prompt to confirm the user's action
  *
  * @param {string} message
@@ -219,4 +246,5 @@ module.exports = {
 	getDevConsoleConfig,
 	initSdk,
 	initRequestId,
+	initFile
 };
