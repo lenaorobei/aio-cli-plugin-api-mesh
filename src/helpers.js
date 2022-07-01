@@ -114,7 +114,6 @@ async function getProject(imsOrgId, imsOrgTitle) {
 
 	if (process.env.TEST_MODE) {
 		let data;
-		initAIOConfigFile(process.env.AIO_CONFIG_FILE);
 
 		try {
 			data = await JSON.parse(readFile(global.file));
@@ -145,7 +144,6 @@ async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
 
 	if (process.env.TEST_MODE) {
 		let data;
-		initAIOConfigFile(process.env.AIO_CONFIG_FILE);
 
 		try {
 			data = await JSON.parse(readFile(global.file));
@@ -260,5 +258,5 @@ module.exports = {
 	getDevConsoleConfig,
 	initSdk,
 	initRequestId,
-	initFile
+	initAIOConfigFile
 };

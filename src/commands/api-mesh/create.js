@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command');
 const { readFile } = require('fs/promises');
-const { initSdk, initRequestId, initFile } = require('../../helpers');
+const { initSdk, initRequestId, initAIOConfigFile } = require('../../helpers');
 const logger = require('../../classes/logger');
 
 class CreateCommand extends Command {
@@ -24,6 +24,9 @@ class CreateCommand extends Command {
 
 		const { args } = this.parse(CreateCommand);
 
+		if (process.env.TEST_MODE) {
+			initAIOConfigFile(process.env.AIO_CONFIG_FILE);
+		}
 		if (!args.file) {
 			this.error('Missing file path. Run aio api-mesh create --help for more info.');
 
