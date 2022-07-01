@@ -112,7 +112,6 @@ async function getProject(imsOrgId, imsOrgTitle) {
 
 	const { consoleCLI } = await getLibConsoleCLI();
 
-	const projects = await consoleCLI.getProjects(imsOrgId);
 	if (process.env.TEST_MODE) {
 		let data;
 
@@ -130,6 +129,7 @@ async function getProject(imsOrgId, imsOrgTitle) {
 			);
 		}
 	} else {
+		const projects = await consoleCLI.getProjects(imsOrgId);
 		if (projects.length !== 0) {
 			const selectedProject = await consoleCLI.promptForSelectProject(projects);
 	
