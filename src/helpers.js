@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 
 const fs = require('fs');
 const inquirer = require('inquirer');
-
+const { readFile } = require('fs/promises');
 const Config = require('@adobe/aio-lib-core-config');
 const { getToken, context } = require('@adobe/aio-lib-ims');
 const { CLI } = require('@adobe/aio-lib-ims/src/context');
@@ -116,8 +116,8 @@ async function getProject(imsOrgId, imsOrgTitle) {
 		let data;
 
 		try {
-			data = await readFile(global.file, 'utf8');
-			const fileProject = data.Project;
+			data = JSON.parse(await readFile('/Users/jonward/.config/aio.json'));
+			const fileProject = data.console.project;
 
 			return fileProject;
 		} catch (error) {
@@ -145,16 +145,34 @@ async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
 
 	const { consoleCLI } = await getLibConsoleCLI();
 
-	const workspaces = await consoleCLI.getWorkspaces(orgId, projectId);
-	if (workspaces.length !== 0) {
-		const selectedWorkspace = await consoleCLI.promptForSelectWorkspace(workspaces);
+	if (process.env.TEST_MODE) {
+		let data;
 
-		return selectedWorkspace;
+		try {
+			data = JSON.parse(await readFile('/Users/jonward/.config/aio.json'));
+			const fileWorkspace = data.console.workspace;
+
+			return fileWorkspace;
+		} catch (error) {
+			logger.error(error);
+
+			this.log(error.message);
+			this.error(
+				'Unable to read the mesh configuration file provided. Please check the file and try again.',
+			);
+		}
 	} else {
-		aioConsoleLogger.error(
-			`No workspaces found for the selected organization: ${imsOrgTitle} and project: ${projectTitle}`,
-		);
-	}
+		const workspaces = await consoleCLI.getWorkspaces(orgId, projectId);
+		if (workspaces.length !== 0) {
+			const selectedWorkspace = await consoleCLI.promptForSelectWorkspace(workspaces);
+	
+			return selectedWorkspace;
+		} else {
+			aioConsoleLogger.error(
+				`No workspaces found for the selected organization: ${imsOrgTitle} and project: ${projectTitle}`,
+			);
+		}
+	}	
 }
 
 /**
