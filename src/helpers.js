@@ -114,9 +114,10 @@ async function getProject(imsOrgId, imsOrgTitle) {
 
 	if (process.env.TEST_MODE) {
 		let data;
+		initAIOConfigFile(process.env.AIO_CONFIG_FILE);
 
 		try {
-			data = JSON.parse(await readFile('/Users/jonward/.config/aio.json'));
+			data = await JSON.parse(readFile(global.file));
 			const fileProject = data.console.project;
 
 			return fileProject;
@@ -124,9 +125,6 @@ async function getProject(imsOrgId, imsOrgTitle) {
 			logger.error(error);
 
 			this.log(error.message);
-			this.error(
-				'Unable to read the mesh configuration file provided. Please check the file and try again.',
-			);
 		}
 	} else {
 		const projects = await consoleCLI.getProjects(imsOrgId);
@@ -147,9 +145,10 @@ async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
 
 	if (process.env.TEST_MODE) {
 		let data;
+		initAIOConfigFile(process.env.AIO_CONFIG_FILE);
 
 		try {
-			data = JSON.parse(await readFile('/Users/jonward/.config/aio.json'));
+			data = await JSON.parse(readFile(global.file));
 			const fileWorkspace = data.console.workspace;
 
 			return fileWorkspace;
@@ -157,9 +156,6 @@ async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
 			logger.error(error);
 
 			this.log(error.message);
-			this.error(
-				'Unable to read the mesh configuration file provided. Please check the file and try again.',
-			);
 		}
 	} else {
 		const workspaces = await consoleCLI.getWorkspaces(orgId, projectId);
@@ -233,7 +229,7 @@ async function initRequestId() {
  * this command request
  * @param {file} file
  */
-async function initFile(file) {
+async function initAIOConfigFile(file) {
 	global.file = file;
 }
 
