@@ -113,7 +113,7 @@ async function getProject(imsOrgId, imsOrgTitle) {
 	const { consoleCLI } = await getLibConsoleCLI();
 
 	const projects = await consoleCLI.getProjects(imsOrgId);
-	if (process.env.READ_FILE) {
+	if (process.env.TEST_MODE) {
 		let data;
 
 		try {
