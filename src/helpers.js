@@ -85,25 +85,40 @@ async function getAuthorizedOrganization() {
 
 	aioConsoleLogger.debug('Get the selected organization');
 
-	const consoleConfigOrg = Config.get('console.org');
+	if (process.env.TEST_MODE) {
+		let fileOrgData;
 
-	if (!consoleConfigOrg) {
-		const organizations = await consoleCLI.getOrganizations();
-		const selectedOrg = await consoleCLI.promptForSelectOrganization(organizations);
+		try {
+			fileOrgData = JSON.parse(await readFile(process.env.JSON_CONFIG_FILE));
+			const fileOrg = fileOrgData.console.org;
 
-		aioConsoleLogger.debug('Set the console config');
+			return fileOrg;
+		} catch (error) {
+			logger.error(error);
 
-		Config.set('console.org', {
-			id: selectedOrg.id,
-			code: selectedOrg.code,
-			name: selectedOrg.name,
-		});
-
-		return Object.assign({}, selectedOrg);
+			this.log(error.message);
+		}
 	} else {
-		logger.info(`Selecting your organization as: ${consoleConfigOrg.name}`);
+		const consoleConfigOrg = Config.get('console.org');
 
-		return Object.assign({}, consoleConfigOrg);
+		if (!consoleConfigOrg) {
+			const organizations = await consoleCLI.getOrganizations();
+			const selectedOrg = await consoleCLI.promptForSelectOrganization(organizations);
+
+			aioConsoleLogger.debug('Set the console config');
+
+			Config.set('console.org', {
+				id: selectedOrg.id,
+				code: selectedOrg.code,
+				name: selectedOrg.name,
+			});
+
+			return Object.assign({}, selectedOrg);
+		} else {
+			logger.info(`Selecting your organization as: ${consoleConfigOrg.name}`);
+
+			return Object.assign({}, consoleConfigOrg);
+		}
 	}
 }
 
@@ -113,11 +128,11 @@ async function getProject(imsOrgId, imsOrgTitle) {
 	const { consoleCLI } = await getLibConsoleCLI();
 
 	if (process.env.TEST_MODE) {
-		let data;
+		let fileDataProject;
 
 		try {
-			data = await JSON.parse(readFile(global.file));
-			const fileProject = data.console.project;
+			fileDataProject = JSON.parse(await readFile(process.env.JSON_CONFIG_FILE));
+			const fileProject = fileDataProject.console.project;
 
 			return fileProject;
 		} catch (error) {
@@ -143,11 +158,11 @@ async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
 	const { consoleCLI } = await getLibConsoleCLI();
 
 	if (process.env.TEST_MODE) {
-		let data;
+		let fileDataWorkspace;
 
 		try {
-			data = await JSON.parse(readFile(global.file));
-			const fileWorkspace = data.console.workspace;
+			fileDataWorkspace = JSON.parse(await readFile(process.env.JSON_CONFIG_FILE));
+			const fileWorkspace = fileDataWorkspace.console.workspace;
 
 			return fileWorkspace;
 		} catch (error) {
@@ -223,15 +238,6 @@ async function initRequestId() {
 }
 
 /**
- * Stores the argument file globally so it can referenced for the lifecycle of 
- * this command request
- * @param {file} file
- */
-async function initAIOConfigFile(file) {
-	global.file = file;
-}
-
-/**
  * Function to run the CLI Y/N prompt to confirm the user's action
  *
  * @param {string} message
@@ -257,6 +263,5 @@ module.exports = {
 	getLibConsoleCLI,
 	getDevConsoleConfig,
 	initSdk,
-	initRequestId,
-	initAIOConfigFile
+	initRequestId
 };
