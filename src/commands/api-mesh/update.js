@@ -45,10 +45,14 @@ class UpdateCommand extends Command {
 			);
 		}
 
-		const shouldContinue = await promptConfirm(
-			`Are you sure you want to update the mesh: ${args.meshId}?`,
-		);
-
+		let shouldContinue;
+		if (!process.env.TEST_MODE) {
+			shouldContinue = await promptConfirm(
+				`Are you sure you want update the mesh: ${args.meshId}?`,
+			);
+		} else {
+			shouldContinue = true;
+		}
 		if (shouldContinue) {
 			try {
 				const response = await schemaServiceClient.updateMesh(

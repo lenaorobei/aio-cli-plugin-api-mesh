@@ -1,14 +1,14 @@
 {
-    "meshConfig": {
-     "sources": [
-        {
-          "name": "test_automation_updated",
-          "handler": {
-            "graphql": {
-              "endpoint": "https://venia.magento.com/graphql"
-            }
+    "meshConfig":{
+       "sources":[
+          {
+             "name":"test_automation_updated",
+             "handler":{
+                "graphql":{
+                   "endpoint":"https://venia.magento.com/graphql"
+                }
+             }
           }
-       }
-    ]
-  }
-}
+       ]
+    }
+ }
